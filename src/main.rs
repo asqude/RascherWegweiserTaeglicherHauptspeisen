@@ -75,21 +75,22 @@ fn main() {
                      let raw_text = parts.join(" ");
                      let clean_text = raw_text.replace("+", "").trim().to_string();
                      
-                     // Split by "|" and keep first part + everything after "|"
+                     // Split by "|" and keep only first part (dish name) and last part (sauce)
                      let pipe_parts: Vec<&str> = clean_text.split('|').collect();
                      let formatted = if pipe_parts.len() >= 2 {
-                         let first = pipe_parts[0].split_whitespace().next().unwrap_or("");
-                         let rest: Vec<&str> = pipe_parts[1..].iter()
-                             .map(|s| s.split_whitespace().next().unwrap_or(""))
-                             .filter(|s| !s.is_empty())
-                             .collect();
-                         if rest.is_empty() {
+                         // First part: full dish name, trimmed
+                         let first = pipe_parts[0].trim();
+                         // Last part: typically the sauce, trimmed
+                         let last = pipe_parts.last().unwrap_or(&"").trim();
+                         
+                         if last.is_empty() {
                              first.to_string()
                          } else {
-                             format!("{} | {}", first, rest.join(" | "))
+                             format!("{}, {}", first, last)
                          }
                      } else {
-                         clean_text.split_whitespace().next().unwrap_or("").to_string()
+                         // No pipe, just return the whole text
+                         clean_text.to_string()
                      };
                      
                      println!("{}", formatted);
